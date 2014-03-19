@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <configSections>
+    <sectionGroup name="Storm">
+      <section name="SvgMagic" type="Storm.SvgMagic.SvgMagicHandlerConfigurationSection, Storm.SvgMagic" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    </sectionGroup>
+  </configSections>
+  
+  <Storm>
+    <SvgMagic xdt:Transform="Remove" />
+  </Storm>
+  
+  <system.webServer>
+    <handlers>
+      <add name="Storm.SvgMagic" xdt:Transform="Remove" verb="GET" path="*.svg" type="Storm.SvgMagic.SvgMagicHandler, Storm.SvgMagic" />
+    </handlers>
+  </system.webServer>
+  
+</configuration>

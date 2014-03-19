@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata>
+    <id>Storm.SvgMagic</id>
+    <version>$version$</version>
+    <authors>Phil Oyston</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Provides HttpHandler fallback functionality for browsers that do not support SVG (Scalable Vector Graphics) by generating and caching alternate images at request time.  Inspired by SVGMagic (http://svgmagic.bitlabs.nl/)</description>
+    <language>en-GB</language>
+    <copyright>Phil Oyston, Storm ID Ltd.</copyright>
+    <tags>svg</tags>
+    <iconUrl>http://stormid.com/media/48267/logo.jpg</iconUrl>
+    <dependencies>
+      <dependency id="Svg" version="1.6.1" />
+    </dependencies>
+  </metadata>
+</package>

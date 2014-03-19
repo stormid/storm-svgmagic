@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <configSections xdt:Transform="InsertBefore(/configuration/*[1])" />
+  <configSections xdt:Locator="XPath(/configuration/configSections[last()])">
+    <section name="SvgMagic" type="Storm.SvgMagic.SvgMagicHandlerConfigurationSection, Storm.SvgMagic" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+  </configSections>
+  <configSections xdt:Transform="RemoveAll" xdt:Locator="Condition(count(*)=0)" />
+  
+  <SvgMagic defaultImageFormat="Png" imageStorageBasePath="~/App_Data/SvgMagic" testMode="false" xdt:Transform="InsertIfMissing" />
+  
+  <system.webServer xdt:Transform="InsertIfMissing">
+    <handlers>
+      <add name="Storm.SvgMagic" xdt:Transform="Remove" xdt:Locator="Match(name)" />
+      <add name="Storm.SvgMagic" xdt:Transform="InsertIfMissing" verb="GET" path="*.svg" type="Storm.SvgMagic.SvgMagicHandler, Storm.SvgMagic" />
+    </handlers>
+  </system.webServer>
+  
+</configuration>

@@ -13,9 +13,9 @@ How to Use
 ==========
 storm-svgmagic is available as a nuget package:
 
-install-package storm-svgmagic
+`install-package storm-svgmagic`
 
-The nuget installer will modify your web.config to add the following:
+The nuget installer will modify your `web.config` to add the following:
 
 ```xml
 <configSections>
@@ -44,7 +44,7 @@ testMode - If set to TRUE, then all svg images will be rendered using their fall
 
 Per Image Configuration Overrides
 =================================
-Rendering can be overriden on a per image basis by appending parameters to the svg url:
+Rendering can be overridden on a per image basis by appending parameters to the svg url:
 
 Override default image format
 -----------------------------

@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Storm-SvgMagic by stormid</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Storm-SvgMagic</h1>
+        <p>.NET HttpHandler fallback functionality for browsers that do not support SVG (Scalable Vector Graphics).</p>
+
+        <p class="view"><a href="https://github.com/stormid/storm-svgmagic">View the Project on GitHub <small>stormid/storm-svgmagic</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/stormid/storm-svgmagic/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/stormid/storm-svgmagic/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/stormid/storm-svgmagic">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="storm-svgmagic-net-svg-httphandler" class="anchor" href="#storm-svgmagic-net-svg-httphandler"><span class="octicon octicon-link"></span></a>storm-SvgMagic (.NET SVG HttpHandler)</h1>
+
+<p>Provides HttpHandler fallback functionality for browsers that do not support SVG (Scalable Vector Graphics) by generating and caching alternate images at request time.  Inspired by SVGMagic (<a href="http://svgmagic.bitlabs.nl/">http://svgmagic.bitlabs.nl/</a>)</p>
+
+<h1>
+<a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h1>
+
+<p><a href="http://storm-svgmagic.azurewebsites.net">http://storm-svgmagic.azurewebsites.net</a></p>
+
+<p>Use your browser tools to emulate IE 8 to see it in action, as storm.svgmagic allows the local browser cache to maintain cached copies you may have to do a hard refresh (ctrl-f5) to see changes</p>
+
+<h1>
+<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to Use</h1>
+
+<p>storm-svgmagic is available as a nuget package:</p>
+
+<p><code>install-package Storm.SvgMagic</code></p>
+
+<p>The nuget installer will modify your <code>web.config</code> to add the following:</p>
+
+<div class="highlight highlight-xml"><pre><span class="nt">&lt;configSections&gt;</span>
+    <span class="nt">&lt;section</span> <span class="na">name=</span><span class="s">"SvgMagic"</span> <span class="na">type=</span><span class="s">"Storm.SvgMagic.SvgMagicHandlerConfigurationSection, Storm.SvgMagic"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/configSections&gt;</span>
+
+<span class="nt">&lt;system.webServer&gt;</span>
+    <span class="nt">&lt;handlers&gt;</span>
+        <span class="nt">&lt;add</span> <span class="na">name=</span><span class="s">"SvgMagic"</span> <span class="na">verb=</span><span class="s">"GET"</span> <span class="na">path=</span><span class="s">"*.svg"</span> <span class="na">type=</span><span class="s">"Storm.SvgMagic.SvgMagicHandler, Storm.SvgMagic"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/handlers&gt;</span>
+<span class="nt">&lt;/system.webServer&gt;</span>
+
+<span class="nt">&lt;SvgMagic</span> <span class="na">defaultImageFormat=</span><span class="s">"Png"</span> <span class="na">imageStorageBasePath=</span><span class="s">"~/App_Data/SvgMagic"</span> <span class="na">testMode=</span><span class="s">"false"</span> <span class="nt">/&gt;</span>
+</pre></div>
+
+<h1>
+<a name="global-configuration" class="anchor" href="#global-configuration"><span class="octicon octicon-link"></span></a>Global Configuration</h1>
+
+<div class="highlight highlight-xml"><pre><span class="nt">&lt;SvgMagic</span> <span class="na">defaultImageFormat=</span><span class="s">"Png|Gif|Jpeg|Bmp"</span> <span class="na">imageStorageBasePath=</span><span class="s">"&lt;app relative or rooted path&gt;"</span> <span class="na">testMode=</span><span class="s">"false|true"</span> <span class="nt">/&gt;</span>
+</pre></div>
+
+<p>defaultImageFormat - Determines the conversion format to use by default (if excluded Png is used)
+imageStorageBasePath - Either a app relative path (using ~/) or a fully rooted path, the application must have write permissions to this directory, if excluded ~/App_Data/SvgMagic is used)
+testMode - If set to TRUE, then all svg images will be rendered using their fallback image type regardless of browser support</p>
+
+<h1>
+<a name="per-image-configuration-overrides" class="anchor" href="#per-image-configuration-overrides"><span class="octicon octicon-link"></span></a>Per Image Configuration Overrides</h1>
+
+<p>Rendering can be overridden on a per image basis by appending parameters to the svg url:</p>
+
+<h2>
+<a name="override-default-image-format" class="anchor" href="#override-default-image-format"><span class="octicon octicon-link"></span></a>Override default image format</h2>
+
+<p>To override the default image format add the "format=" parameter to the url, see below:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"~/myimage.svg?format=png|gif|jpeg|bmp"</span> <span class="na">alt=</span><span class="s">"my image"</span> <span class="nt">/&gt;</span>
+</pre></div>
+
+<h2>
+<a name="set-size-dimensions-for-fallback-image" class="anchor" href="#set-size-dimensions-for-fallback-image"><span class="octicon octicon-link"></span></a>Set size dimensions for fallback image</h2>
+
+<p>By default the fallback image rendered will use the dimensions from the original .svg, if however you want to ensure that the fallback image is rendered at specific dimensions you can specify the <code>height=</code> and/or <code>width=</code> url parameters.</p>
+
+<p>If only one of <code>height=</code> or <code>width=</code> is specified then the fallback image will maintain with a relative height or width to maintain the appropriate aspect ratio.</p>
+
+<p>Both height and width are specified in pixels.</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"~/myimage.svg?height=100"</span> <span class="na">alt=</span><span class="s">"my image"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"~/myimage.svg?width=100"</span> <span class="na">alt=</span><span class="s">"my image"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"~/myimage.svg?width=100&amp;height=100"</span> <span class="na">alt=</span><span class="s">"my image"</span> <span class="nt">/&gt;</span>
+</pre></div>
+
+<h2>
+<a name="override-svg-support-checking" class="anchor" href="#override-svg-support-checking"><span class="octicon octicon-link"></span></a>Override SVG support checking</h2>
+
+<p>To force the fallback image to be generated/rendered add the "force=true" parameter to the url, see below:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"~/myimage.svg?force=true"</span> <span class="na">alt=</span><span class="s">"my image"</span> <span class="nt">/&gt;</span>
+</pre></div>
+
+<h2>
+<a name="force-refresh-of-cached-image" class="anchor" href="#force-refresh-of-cached-image"><span class="octicon octicon-link"></span></a>Force refresh of cached image</h2>
+
+<p>To force the cached image to be re-generated add the "refresh=true" parameter to the url, see below:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"~/myimage.svg?refresh=true"</span> <span class="na">alt=</span><span class="s">"my image"</span> <span class="nt">/&gt;</span>
+</pre></div>
+
+<p>This is better used to individually refresh an image directly, combine with the "format=" parameter to refresh a specific fallback image type:</p>
+
+<ul>
+<li><a href="http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?force=true&amp;refresh=true">http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?force=true&amp;refresh=true</a></li>
+<li><a href="http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?force=true&amp;refresh=true&amp;format=png">http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?force=true&amp;refresh=true&amp;format=png</a></li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/stormid">stormid</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>

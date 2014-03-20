@@ -34,7 +34,6 @@ namespace Storm.SvgMagic.UnitTests.Integration
         {
             protected string _path;
             protected Stream _pathStream;
-            protected bool _result;
 
             protected override void Context()
             {
@@ -69,7 +68,6 @@ namespace Storm.SvgMagic.UnitTests.Integration
         {
             protected string _path;
             protected Stream _pathStream;
-            protected bool _result;
 
             protected override void Context()
             {
@@ -134,7 +132,6 @@ namespace Storm.SvgMagic.UnitTests.Integration
         {
             protected string _path;
             protected Stream _pathStream;
-            protected bool _result;
 
             private MethodThatThrows exception;
 
@@ -164,7 +161,6 @@ namespace Storm.SvgMagic.UnitTests.Integration
         public class WhenCreatingFile : LocalFileSystemContext
         {
             protected string _path;
-            protected bool _result;
 
             protected override void Context()
             {
@@ -191,7 +187,6 @@ namespace Storm.SvgMagic.UnitTests.Integration
         public class WhenCreatingDirectory : LocalFileSystemContext
         {
             protected string _path;
-            protected bool _result;
 
             protected override void Context()
             {

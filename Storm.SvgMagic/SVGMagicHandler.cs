@@ -6,7 +6,8 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Web;
-using Storm.SvgMagic.Abstractions;
+using Storm.SvgMagic.Services;
+using Storm.SvgMagic.Services.Impl;
 using Svg;
 
 namespace Storm.SvgMagic
@@ -42,6 +43,7 @@ namespace Storm.SvgMagic
             var outputStream = new MemoryStream();
             using (var bmp = svg.Draw())
             {
+                Thread.Sleep(50);
                 switch (options.Format)
                 {
                     case SvgMagicImageFormat.Bmp:
@@ -83,18 +85,19 @@ namespace Storm.SvgMagic
             return _imageCache ?? new FileSystemImageCache(context.Request.MapPath(_config.ImageStorageBasePath));
         }
 
-        protected virtual Stream GetResourceStream(string resourcePath, bool throwErrorOnFail = false)
+        protected virtual Stream GetResourceStream(string resourcePath, int retryCounter = 0)
         {
             if (string.IsNullOrWhiteSpace(resourcePath) || !File.Exists(resourcePath)) return null;
 
             try
             {
-                return File.Open(resourcePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                Thread.Sleep(50);
+                return File.Open(resourcePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
             }
             catch (IOException)
             {
-                Thread.Sleep(25);
-                return GetResourceStream(resourcePath, true);
+                if (retryCounter >= 5) return null;
+                return GetResourceStream(resourcePath, retryCounter++);
             }
         }
 

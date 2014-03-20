@@ -16,6 +16,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storm.SvgMagic.UnitTests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storm.SvgMagic.Samples", "Storm.SvgMagic.Samples\Storm.SvgMagic.Samples.csproj", "{2F798BC2-9539-44F5-BC40-5C5CF1A8E032}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{0596EC12-3FD7-4980-8CA6-FF9ACABFA084}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{2E5CB073-9731-4F69-94DA-72A0844B93F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,5 +41,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2F798BC2-9539-44F5-BC40-5C5CF1A8E032} = {0596EC12-3FD7-4980-8CA6-FF9ACABFA084}
+		{30D21289-3E5B-4B2C-8ADC-2FCDA038A5CD} = {2E5CB073-9731-4F69-94DA-72A0844B93F3}
 	EndGlobalSection
 EndGlobal

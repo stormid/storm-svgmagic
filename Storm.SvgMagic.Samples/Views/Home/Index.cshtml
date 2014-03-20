@@ -8,25 +8,35 @@
     }
 </style>
 
-<table cellspacing="0" cellpadding="0">
+<table cellspacing="0" cellpadding="4">
+    <tr>
+        <th>Fallback Action</th>
+        <th>Original</th>
+        <th>Forced Conversion</th>
+    </tr>
     <tr>
         <td>Default</td>
         <td><img src="~/Content/images/scotland.svg" /></td>
+        <td><img src="~/Content/images/scotland.svg?force=true" /></td>
     </tr>
     <tr>
-        <td>Render as Jpeg</td>
+        <td>Jpeg</td>
         <td><img src="~/Content/images/scotland.svg?format=jpeg" /></td>
+        <td><img src="~/Content/images/scotland.svg?force=true&format=jpeg" /></td>
     </tr>
     <tr>
-        <td>Render as Gif</td>
+        <td>Gif</td>
         <td><img src="~/Content/images/scotland.svg?format=gif" /></td>
+        <td><img src="~/Content/images/scotland.svg?force=true&format=gif" /></td>
     </tr>
     <tr>
-        <td>Render as Png</td>
+        <td>Png</td>
         <td><img src="~/Content/images/scotland.svg?format=png" /></td>
+        <td><img src="~/Content/images/scotland.svg?force=true&format=png" /></td>
     </tr>
     <tr>
-        <td>Render as Bmp</td>
+        <td>Bmp</td>
         <td><img src="~/Content/images/scotland.svg?format=bmp" /></td>
+        <td><img src="~/Content/images/scotland.svg?force=true&format=bmp" /></td>
     </tr>
 </table>

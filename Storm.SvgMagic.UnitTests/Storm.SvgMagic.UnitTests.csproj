@@ -52,6 +52,8 @@
     <Compile Include="Base\ContextSpecification.cs" />
     <Compile Include="Base\SpecificationExtensions.cs" />
     <Compile Include="Base\TestBase.cs" />
+    <Compile Include="FileSystemImageCacheContext.cs" />
+    <Compile Include="Integration\LocalFileSystemContext.cs" />
     <Compile Include="SvgMagicHandlerContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

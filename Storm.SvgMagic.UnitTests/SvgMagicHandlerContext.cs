@@ -9,68 +9,69 @@ using System.Threading.Tasks;
 using System.Web;
 using Moq;
 using NUnit.Framework;
-using Storm.SvgMagic.Abstractions;
+using Storm.SvgMagic.Services;
 using Storm.SvgMagic.UnitTests.Base;
 using System.Reflection;
 
 namespace Storm.SvgMagic.UnitTests
 {
-    public class FakeSvgMagicHandler : SvgMagicHandler
+    [Category("Handler")]
+    internal abstract class SvgMagicHandlerContext : ContextSpecification
     {
-        private readonly IImageCache _imageCache;
-        public FakeSvgMagicHandler(IImageCache imageCache)
+        public class FakeSvgMagicHandler : SvgMagicHandler
         {
-            _imageCache = imageCache;
-        }
-
-        public Func<string, DateTime> GetResourceUpdateDateTimeFunc { get; set; }
-        protected override DateTime GetResourceUpdateDateTime(string resourcePath)
-        {
-            if (GetResourceUpdateDateTimeFunc != null)
+            private readonly IImageCache _imageCache;
+            public FakeSvgMagicHandler(IImageCache imageCache)
             {
-                return GetResourceUpdateDateTimeFunc(resourcePath);
+                _imageCache = imageCache;
             }
-            return base.GetResourceUpdateDateTime(resourcePath);
-        }
 
-        public Func<string, bool> ResourceExistsFunc { get; set; }
-        protected override bool ResourceExists(string resourcePath)
-        {
-            if (ResourceExistsFunc != null)
+            public Func<string, DateTime> GetResourceUpdateDateTimeFunc { get; set; }
+            protected override DateTime GetResourceUpdateDateTime(string resourcePath)
             {
-                return ResourceExistsFunc(resourcePath);
+                if (GetResourceUpdateDateTimeFunc != null)
+                {
+                    return GetResourceUpdateDateTimeFunc(resourcePath);
+                }
+                return base.GetResourceUpdateDateTime(resourcePath);
             }
-            return base.ResourceExists(resourcePath);
-        }
 
-        protected override IImageCache GetImageCache(HttpContextBase context)
-        {
-            return _imageCache;
-        }
-
-        public Func<string, bool, Stream> GetResourceStreamFunc { get; set; }
-        protected override Stream GetResourceStream(string resourcePath, bool throwErrorOnFail = false)
-        {
-            if (GetResourceStreamFunc != null)
+            public Func<string, bool> ResourceExistsFunc { get; set; }
+            protected override bool ResourceExists(string resourcePath)
             {
-                return GetResourceStreamFunc(resourcePath, throwErrorOnFail);
+                if (ResourceExistsFunc != null)
+                {
+                    return ResourceExistsFunc(resourcePath);
+                }
+                return base.ResourceExists(resourcePath);
             }
-            return base.GetResourceStream(resourcePath, throwErrorOnFail);
-        }
 
-        public Func<SvgMagicOptions, HttpBrowserCapabilitiesBase, bool> NoSvgSupportFunc { get; set; }
-        protected override bool NoSvgSupport(SvgMagicOptions options, HttpBrowserCapabilitiesBase browser)
-        {
-            if (NoSvgSupportFunc != null)
+            protected override IImageCache GetImageCache(HttpContextBase context)
             {
-                return NoSvgSupportFunc(options, browser);
+                return _imageCache;
             }
-            return base.NoSvgSupport(options, browser);
-        }
-    }
 
-    public abstract class SvgMagicHandlerContext : ContextSpecification
-    {
+            public Func<string, int, Stream> GetResourceStreamFunc { get; set; }
+            protected override Stream GetResourceStream(string resourcePath, int retryCounter = 0)
+            {
+                if (GetResourceStreamFunc != null)
+                {
+                    return GetResourceStreamFunc(resourcePath, retryCounter);
+                }
+                return base.GetResourceStream(resourcePath, retryCounter);
+            }
+
+            public Func<SvgMagicOptions, HttpBrowserCapabilitiesBase, bool> NoSvgSupportFunc { get; set; }
+            protected override bool NoSvgSupport(SvgMagicOptions options, HttpBrowserCapabilitiesBase browser)
+            {
+                if (NoSvgSupportFunc != null)
+                {
+                    return NoSvgSupportFunc(options, browser);
+                }
+                return base.NoSvgSupport(options, browser);
+            }
+        }
+
         protected FakeSvgMagicHandler _handler;
         protected Mock<HttpContextBase> _requestContext;
         protected Mock<HttpRequestBase> _request;

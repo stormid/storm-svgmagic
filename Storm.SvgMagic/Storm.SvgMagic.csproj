@@ -47,8 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstractions\IImageCache.cs" />
+    <Compile Include="Services\Impl\FileSystemImageCache.cs" />
+    <Compile Include="Services\IFileSystem.cs" />
+    <Compile Include="Services\IImageCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Impl\LocalFileSystem.cs" />
     <Compile Include="SVGMagicHandler.cs" />
     <Compile Include="SvgMagicHandlerConfigurationSection.cs" />
     <Compile Include="SvgMagicImageFormat.cs" />

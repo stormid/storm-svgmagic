@@ -68,5 +68,6 @@ To force the cached image to be re-generated add the "refresh=true" parameter to
 ```
 This is better used to individually refresh an image directly, combine with the "format=" parameter to refresh a specific fallback image type:
 
-http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?refresh=true
-http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?refresh=true&format=png
+* http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?refresh=true
+* http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?refresh=true&format=png
+

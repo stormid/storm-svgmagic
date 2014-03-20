@@ -40,9 +40,34 @@ namespace Storm.SvgMagic
 
             var svg = SvgDocument.Open<SvgDocument>(svgInput);
             if (svg == null) return null;
+
+            if (options.HasDimensions())
+            {
+                svg.Height = options.Height;
+                svg.Width = options.Width;
+            }
+            else if (options.Height > 0)
+            {
+                var aspectRatio = svg.Height/svg.Width;
+                svg.Height = options.Height;
+                svg.Width = options.Height/aspectRatio;
+            }
+            else if (options.Width > 0)
+            {
+                var aspectRatio = svg.Width/svg.Height;
+                svg.Width = options.Width;
+                svg.Height = options.Width/aspectRatio;
+            }
+            else
+            {
+                options.Height = int.Parse(svg.Height.ToString());
+                options.Width = int.Parse(svg.Width.ToString());
+            }
+
             var outputStream = new MemoryStream();
             using (var bmp = svg.Draw())
             {
+                
                 Thread.Sleep(50);
                 switch (options.Format)
                 {
@@ -101,6 +126,15 @@ namespace Storm.SvgMagic
             }
         }
 
+        private bool ShouldInvalidateCachedItem(DateTime resourceDateTime, DateTime cacheItemDateTime)
+        {
+            // remove milliseconds from times
+            resourceDateTime = resourceDateTime.AddTicks(-(resourceDateTime.Ticks % TimeSpan.TicksPerSecond));
+            cacheItemDateTime = cacheItemDateTime.AddTicks(-(cacheItemDateTime.Ticks % TimeSpan.TicksPerSecond));
+
+            return resourceDateTime > cacheItemDateTime;
+        }
+
         public void ProcessRequest(HttpContextBase context)
         {
             var startTime = DateTime.Now;
@@ -121,12 +155,12 @@ namespace Storm.SvgMagic
             }
 
             DateTime modifiedSince;
+            DateTime resourceModifiedDate = GetResourceUpdateDateTime(resourcePath);
+            resourceModifiedDate = resourceModifiedDate.AddTicks(-(resourceModifiedDate.Ticks % TimeSpan.TicksPerSecond));
+
             string ifModifiedSince = context.Request.Headers["If-Modified-Since"];
             if (!string.IsNullOrEmpty(ifModifiedSince) && ifModifiedSince.Length > 0 && DateTime.TryParse(ifModifiedSince, out modifiedSince))
             {
-                var resourceModifiedDate = GetResourceUpdateDateTime(resourcePath);
-                resourceModifiedDate = resourceModifiedDate.AddTicks(-(resourceModifiedDate.Ticks % TimeSpan.TicksPerSecond));
-
                 if (resourceModifiedDate <= modifiedSince)
                 {
                     context.Response.StatusCode = 304;
@@ -149,7 +183,7 @@ namespace Storm.SvgMagic
 
                 using (var cachedFileStream = imageCache.Get(urlPath, options))
                 {
-                    if (cachedFileStream == null)
+                    if (cachedFileStream == null || ShouldInvalidateCachedItem(resourceModifiedDate, imageCache.GetCacheItemModifiedDateTime(urlPath, options)))
                     {
                         using (var svg = GetResourceStream(resourcePath))
                         {
@@ -166,11 +200,13 @@ namespace Storm.SvgMagic
                                     context.Response.StatusCode = 500;
                                 }
                             }
+                            svg.Close();
                         }
                     }
                     else
                     {
                         cachedFileStream.CopyTo(context.Response.OutputStream);
+                        cachedFileStream.Close();
                     }
                 }
                 context.Response.ContentType = options.MimeType;

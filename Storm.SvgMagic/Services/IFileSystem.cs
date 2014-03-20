@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -13,5 +14,6 @@ namespace Storm.SvgMagic.Services
         string ReadAllText(string path, Encoding encoding);
         byte[] ReadAllBytes(string path);
         void Create(string path, bool asDirectory = true);
+        DateTime GetModificationDateTime(string path);
     }
 }

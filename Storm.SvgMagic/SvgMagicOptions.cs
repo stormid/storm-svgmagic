@@ -21,6 +21,14 @@ namespace Storm.SvgMagic
             bool.TryParse(queryStringParams.Get("force"), out force);
             options.Force = force;
 
+            int height;
+            int.TryParse(queryStringParams.Get("height"), out height);
+            options.Height = height;
+
+            int width;
+            int.TryParse(queryStringParams.Get("width"), out width);
+            options.Width = width;
+
             options.SetImageFormat(config);
 
             if (config.TestMode)
@@ -42,6 +50,14 @@ namespace Storm.SvgMagic
 
         public string MimeType { get; set; }
         public string Extension { get; set; }
+
+        public int Height { get; set; }
+        public int Width { get; set; }
+
+        public bool HasDimensions()
+        {
+            return Height > 0 && Width > 0;
+        }
 
         private void SetImageFormat(SvgMagicHandlerConfigurationSection config)
         {

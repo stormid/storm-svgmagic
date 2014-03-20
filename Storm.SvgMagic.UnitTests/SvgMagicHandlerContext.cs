@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -121,6 +122,7 @@ namespace Storm.SvgMagic.UnitTests
             
             _handler.ResourceExistsFunc = resourcePath => true;
             _handler.GetResourceStreamFunc = (s, e) => GetSampleImageStream();
+            _handler.GetResourceUpdateDateTimeFunc = s => DateTime.Now;
         }
 
         protected override void Because()
@@ -226,7 +228,6 @@ namespace Storm.SvgMagic.UnitTests
             {
                 _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
             }
-
         }
 
         public class WhenForcingSvgToGif : SvgMagicHandlerContext
@@ -252,7 +253,6 @@ namespace Storm.SvgMagic.UnitTests
             {
                 _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
             }
-
         }
 
         public class WhenForcingSvgToBmp : SvgMagicHandlerContext
@@ -271,6 +271,127 @@ namespace Storm.SvgMagic.UnitTests
             public void ShouldSendExpectedImageFormatToResponse()
             {
                 _response.Object.ContentType.ShouldEqual("image/bmp");
+            }
+
+            [Test]
+            public void ShouldHaveAlteredImageCache()
+            {
+                _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
+            }
+        }
+
+        public class WhenForcingSvgToBmpWithDimensions : SvgMagicHandlerContext
+        {
+            protected Size _size;
+
+            protected override void Context()
+            {
+                _imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Callback(
+                    (Stream s, string path, SvgMagicOptions options) =>
+                    {
+                        var bitmap = new Bitmap(s);
+                        _size = bitmap.Size;
+                    }).Verifiable();
+
+                _queryString.Add("force", "true");
+                _queryString.Add("format", "png");
+                _queryString.Add("height", "1500");
+                _queryString.Add("width", "2000");
+
+                _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
+            }
+
+            [Test]
+            public void ShouldSendExpectedImageFormatToResponse()
+            {
+                _response.Object.ContentType.ShouldEqual("image/png");
+            }
+
+            [Test]
+            public void ShouldGenerateImageWithExpectedDimensions()
+            {
+                _size.Height.ShouldEqual(1500);
+                _size.Width.ShouldEqual(2000);
+            }
+
+            [Test]
+            public void ShouldHaveAlteredImageCache()
+            {
+                _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
+            }
+        }
+
+        public class WhenForcingSvgToBmpWithOnlyWidthDimension : SvgMagicHandlerContext
+        {
+            protected Size _size;
+
+            protected override void Context()
+            {
+                _imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Callback(
+                    (Stream s, string path, SvgMagicOptions options) =>
+                    {
+                        var bitmap = new Bitmap(s);
+                        _size = bitmap.Size;
+                    }).Verifiable();
+
+                _queryString.Add("force", "true");
+                _queryString.Add("format", "png");
+                _queryString.Add("width", "2500");
+
+                _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
+            }
+
+            [Test]
+            public void ShouldSendExpectedImageFormatToResponse()
+            {
+                _response.Object.ContentType.ShouldEqual("image/png");
+            }
+
+            [Test]
+            public void ShouldGenerateImageWithExpectedDimensions()
+            {
+                _size.Height.ShouldEqual(1500);
+                _size.Width.ShouldEqual(2500);
+            }
+
+            [Test]
+            public void ShouldHaveAlteredImageCache()
+            {
+                _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
+            }
+        }
+
+        public class WhenForcingSvgToBmpWithOnlyHeightDimension : SvgMagicHandlerContext
+        {
+            protected Size _size;
+
+            protected override void Context()
+            {
+                _imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Callback(
+                    (Stream s, string path, SvgMagicOptions options) =>
+                    {
+                        var bitmap = new Bitmap(s);
+                        _size = bitmap.Size;
+                    }).Verifiable();
+
+                _queryString.Add("force", "true");
+                _queryString.Add("format", "png");
+                _queryString.Add("height", "1500");
+
+                _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
+            }
+
+            [Test]
+            public void ShouldSendExpectedImageFormatToResponse()
+            {
+                _response.Object.ContentType.ShouldEqual("image/png");
+            }
+
+            [Test]
+            public void ShouldGenerateImageWithExpectedDimensions()
+            {
+                _size.Height.ShouldEqual(1500);
+                _size.Width.ShouldEqual(2500);
             }
 
             [Test]
@@ -357,12 +478,19 @@ namespace Storm.SvgMagic.UnitTests
         {
             protected override void Context()
             {
+                _request.SetupGet(s => s.CurrentExecutionFilePath).Returns("scotland.svg");
+                _request.Setup(s => s.MapPath(It.IsAny<string>())).Returns("scotland.svg");
+
                 _imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Verifiable();
 
                 _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
 
                 _imageCache.Setup(s => s.Get(It.IsAny<string>(), It.IsAny<SvgMagicOptions>()))
                     .Returns(GetSampleImageStream);
+                
+                _imageCache.Setup(s => s.GetCacheItemModifiedDateTime(It.IsAny<string>(), It.IsAny<SvgMagicOptions>()))
+                    .Returns(DateTime.Now);
+
                 _handler.NoSvgSupportFunc = (options, @base) => true;
             }
 
@@ -376,6 +504,39 @@ namespace Storm.SvgMagic.UnitTests
             public void ShouldNotHaveAlteredImageCache()
             {
                 _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Never);
+            }
+        }
+
+        public class WhenImageShouldBeReplacedInCacheForNonCompatibleBrowser : SvgMagicHandlerContext
+        {
+            protected override void Context()
+            {
+                _request.SetupGet(s => s.CurrentExecutionFilePath).Returns("scotland.svg");
+                _request.Setup(s => s.MapPath(It.IsAny<string>())).Returns("scotland.svg");
+
+                _imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Verifiable();
+
+                _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
+
+                _imageCache.Setup(s => s.Get(It.IsAny<string>(), It.IsAny<SvgMagicOptions>()))
+                    .Returns(GetSampleImageStream);
+
+                _imageCache.Setup(s => s.GetCacheItemModifiedDateTime(It.IsAny<string>(), It.IsAny<SvgMagicOptions>()))
+                    .Returns(DateTime.Now.AddDays(-1));
+
+                _handler.NoSvgSupportFunc = (options, @base) => true;
+            }
+
+            [Test]
+            public void ShouldSendImageCachedResponse()
+            {
+                _response.Object.ContentType.ShouldEqual("image/png");
+            }
+
+            [Test]
+            public void ShouldAlterImageCache()
+            {
+                _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
             }
         }
     }

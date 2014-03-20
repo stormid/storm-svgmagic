@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -71,6 +72,11 @@ namespace Storm.SvgMagic.Services.Impl
                     fs.Flush();
                 }
             }
+        }
+
+        public DateTime GetModificationDateTime(string path)
+        {
+            return File.GetLastWriteTime(path);
         }
     }
 }

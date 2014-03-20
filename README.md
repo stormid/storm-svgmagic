@@ -53,6 +53,19 @@ To override the default image format add the "format=" parameter to the url, see
 <img src="~/myimage.svg?format=png|gif|jpeg|bmp" alt="my image" />
 ```
 
+Set size dimensions for fallback image
+-----------------------------
+By default the fallback image rendered will use the dimensions from the original .svg, if however you want to ensure that the fallback image is rendered at specific dimensions you can specify the `height=` and/or `width=` url parameters.
+
+If only one of `height=` or `width=` is specified then the fallback image will maintain with a relative height or width to maintain the appropriate aspect ratio.
+
+Both height and width are specified in pixels.
+```html
+<img src="~/myimage.svg?height=100" alt="my image" />
+<img src="~/myimage.svg?width=100" alt="my image" />
+<img src="~/myimage.svg?width=100&height=100" alt="my image" />
+```
+
 Override SVG support checking
 -----------------------------
 To force the fallback image to be generated/rendered add the "force=true" parameter to the url, see below:
@@ -70,4 +83,3 @@ This is better used to individually refresh an image directly, combine with the 
 
 * http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?force=true&refresh=true
 * http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?force=true&refresh=true&format=png
-

@@ -87,9 +87,9 @@ namespace Storm.SvgMagic.UnitTests
 
         protected Mock<IImageCache> _imageCache;
 
-        protected Stream GetSampleImageStream()
+        protected Stream GetSampleImageStream(string image = "scotland")
         {
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream("Storm.SvgMagic.UnitTests.scotland.svg");
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream("Storm.SvgMagic.UnitTests." +image +".svg");
         }
 
         protected override void SharedContext()
@@ -486,7 +486,7 @@ namespace Storm.SvgMagic.UnitTests
                 _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
 
                 _imageCache.Setup(s => s.Get(It.IsAny<string>(), It.IsAny<SvgMagicOptions>()))
-                    .Returns(GetSampleImageStream);
+                    .Returns(GetSampleImageStream());
                 
                 _imageCache.Setup(s => s.GetCacheItemModifiedDateTime(It.IsAny<string>(), It.IsAny<SvgMagicOptions>()))
                     .Returns(DateTime.Now);
@@ -519,7 +519,7 @@ namespace Storm.SvgMagic.UnitTests
                 _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
 
                 _imageCache.Setup(s => s.Get(It.IsAny<string>(), It.IsAny<SvgMagicOptions>()))
-                    .Returns(GetSampleImageStream);
+                    .Returns(GetSampleImageStream());
 
                 _imageCache.Setup(s => s.GetCacheItemModifiedDateTime(It.IsAny<string>(), It.IsAny<SvgMagicOptions>()))
                     .Returns(DateTime.Now.AddDays(-1));

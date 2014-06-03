@@ -67,7 +67,11 @@
       <Name>Storm.SvgMagic</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="scotland_percentages.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="scotland.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

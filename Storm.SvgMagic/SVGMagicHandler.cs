@@ -41,6 +41,11 @@ namespace Storm.SvgMagic
             var svg = SvgDocument.Open<SvgDocument>(svgInput);
             if (svg == null) return null;
 
+            if ((svg.Height.Type == SvgUnitType.Percentage) || (svg.Width.Type == SvgUnitType.Percentage))
+            {
+                return null;
+            }
+
             if (options.HasDimensions())
             {
                 svg.Height = options.Height;
@@ -48,7 +53,7 @@ namespace Storm.SvgMagic
             }
             else if (options.Height > 0)
             {
-                var aspectRatio = svg.Height/svg.Width;
+                var aspectRatio = svg.Height.Value/svg.Width.Value;
                 svg.Height = options.Height;
                 svg.Width = options.Height/aspectRatio;
             }
@@ -60,8 +65,8 @@ namespace Storm.SvgMagic
             }
             else
             {
-                options.Height = int.Parse(svg.Height.ToString());
-                options.Width = int.Parse(svg.Width.ToString());
+                options.Height = int.Parse(svg.Height.Value.ToString());
+                options.Width = int.Parse(svg.Width.Value.ToString());
             }
 
             var outputStream = new MemoryStream();

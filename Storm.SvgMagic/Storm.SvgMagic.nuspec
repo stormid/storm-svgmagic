@@ -2,9 +2,12 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata>
     <id>Storm.SvgMagic</id>
+    <title>SVG Magic for .NET</title>
     <version>$version$</version>
     <authors>Phil Oyston</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>http://stormid.github.io/storm-svgmagic/</projectUrl>
+    <summary>Provides HttpHandler fallback (image conversion) functionality for browsers that do not support SVG (Scalable Vector Graphics)</summary>
     <description>Provides HttpHandler fallback functionality for browsers that do not support SVG (Scalable Vector Graphics) by generating and caching alternate images at request time.  Inspired by SVGMagic (http://svgmagic.bitlabs.nl/)</description>
     <language>en-GB</language>
     <copyright>Phil Oyston, Storm ID Ltd.</copyright>

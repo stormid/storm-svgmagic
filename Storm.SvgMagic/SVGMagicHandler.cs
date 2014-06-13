@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Web;
+using Storm.SvgMagic.Exceptions;
 using Storm.SvgMagic.Services;
 using Storm.SvgMagic.Services.Impl;
 using Svg;
@@ -36,13 +39,22 @@ namespace Storm.SvgMagic
 
         protected virtual Stream ConvertSvg(Stream svgInput, SvgMagicOptions options, bool failOnError = false)
         {
-            if (svgInput == null || !svgInput.CanRead) return null;
+            if (svgInput == null || !svgInput.CanRead)
+            {
+                if(failOnError) throw new SvgMagicException("Svg input stream was null or could not be read", HttpStatusCode.NotFound);
+                return null;
+            }
 
             var svg = SvgDocument.Open<SvgDocument>(svgInput);
-            if (svg == null) return null;
+            if (svg == null)
+            {
+                if (failOnError) throw new SvgMagicException("Unable to open stream as Svg", HttpStatusCode.UnsupportedMediaType);
+                return null;
+            }
 
             if ((svg.Height.Type == SvgUnitType.Percentage) || (svg.Width.Type == SvgUnitType.Percentage))
             {
+                if (failOnError) throw new SvgMagicException("Svg's with percentage based dimensions are not supported for fallback conversion", HttpStatusCode.UnsupportedMediaType);
                 return null;
             }
 
@@ -89,7 +101,7 @@ namespace Storm.SvgMagic
                         bmp.Save(outputStream, ImageFormat.Gif);
                         break;
                     default:
-                        throw new InvalidDataException("Unknown image format specified");
+                        throw new SvgMagicException(string.Format("Unknown image format specified - {0}", options.Format), HttpStatusCode.UnsupportedMediaType);
                 }
             }
             return outputStream;
@@ -143,9 +155,37 @@ namespace Storm.SvgMagic
         public void ProcessRequest(HttpContextBase context)
         {
             var startTime = DateTime.Now;
+            try
+            {
+                ProcessRequestCore(context);
+            }
+            catch (SvgMagicException ex)
+            {
+                context.Response.StatusCode = (int) ex.StatusCode;
+                context.Response.StatusDescription = ex.Message;
+                Trace.TraceError(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                context.Response.StatusDescription = "An unexpected failure occurred while processing the request";
+                Trace.TraceError(ex.ToString());                
+            }
+            finally
+            {
+                var elapsed = DateTime.Now - startTime;
+                context.Response.AddHeader("X-SvgMagic-Version", _version);
+                context.Response.AddHeader("X-SvgMagic-ProcessingTime", elapsed.TotalMilliseconds.ToString());
+                context.Response.Flush();
+                context.Response.End();                
+            }
+        }
+
+        protected virtual void ProcessRequestCore(HttpContextBase context)
+        {
             if (context.Request.CurrentExecutionFilePathExtension != string.Format(".{0}", _config.SvgExtension))
             {
-                context.Response.StatusCode = 500;
+                context.Response.StatusCode = 415;
                 context.Response.StatusDescription = string.Format("Invalid resource type for handler, handler supports files with '{0}' extension only", _config.SvgExtension);
                 return;
             }
@@ -192,7 +232,7 @@ namespace Storm.SvgMagic
                     {
                         using (var svg = GetResourceStream(resourcePath))
                         {
-                            using (var outputStream = ConvertSvg(svg, options))
+                            using (var outputStream = ConvertSvg(svg, options, true))
                             {
                                 if (outputStream != null)
                                 {
@@ -202,7 +242,8 @@ namespace Storm.SvgMagic
                                 }
                                 else
                                 {
-                                    context.Response.StatusCode = 500;
+                                    context.Response.StatusCode = 415;
+                                    context.Response.StatusDescription = "Unable to convert Svg to " +options.MimeType;
                                 }
                             }
                             svg.Close();
@@ -221,12 +262,6 @@ namespace Storm.SvgMagic
                 context.Response.ContentType = Configuration.SvgMimeType;
                 context.Response.TransmitFile(resourcePath);
             }
-
-            var elapsed = DateTime.Now - startTime;
-            context.Response.AddHeader("X-SVGMagic-Version", _version);
-            context.Response.AddHeader("X-SVGMagic-ProcessingTime", elapsed.TotalMilliseconds.ToString());
-            context.Response.Flush();
-            context.Response.End();
         }
 
         protected virtual bool NoSvgSupport(SvgMagicOptions options, HttpBrowserCapabilitiesBase browser)

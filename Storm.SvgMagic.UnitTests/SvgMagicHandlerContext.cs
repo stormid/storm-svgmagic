@@ -413,9 +413,9 @@ namespace Storm.SvgMagic.UnitTests
             }
 
             [Test]
-            public void ShouldSend500InternalServerError()
+            public void ShouldSend415UnsupportedMediaType()
             {
-                _response.Object.StatusCode.ShouldEqual(500);
+                _response.Object.StatusCode.ShouldEqual(415);
             }
         }
 

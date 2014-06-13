@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\SVGMagicException.cs" />
     <Compile Include="Services\Impl\FileSystemImageCache.cs" />
     <Compile Include="Services\IFileSystem.cs" />
     <Compile Include="Services\IImageCache.cs" />

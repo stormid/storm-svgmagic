@@ -210,8 +210,6 @@ namespace Storm.SvgMagic
                 if (resourceModifiedDate <= modifiedSince)
                 {
                     context.Response.StatusCode = 304;
-                    context.Response.Flush();
-                    context.Response.End();
                     return;
                 }
             }

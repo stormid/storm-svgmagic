@@ -310,8 +310,8 @@ namespace Storm.SvgMagic.UnitTests
             [Test]
             public void ShouldGenerateImageWithExpectedDimensions()
             {
-                _size.Height.ShouldEqual(1500.51);
-                _size.Width.ShouldEqual(2000.51);
+                _size.Height.ShouldEqual(1501);
+                _size.Width.ShouldEqual(2001);
             }
 
             [Test]

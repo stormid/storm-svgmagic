@@ -280,7 +280,48 @@ namespace Storm.SvgMagic.UnitTests
             }
         }
 
-        public class WhenForcingSvgToBmpWithDimensions : SvgMagicHandlerContext
+        public class WhenForcingSvgToPngWithDimensionswithDecimalPoints : SvgMagicHandlerContext
+        {
+            protected Size _size;
+
+            protected override void Context()
+            {
+                _imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Callback(
+                    (Stream s, string path, SvgMagicOptions options) =>
+                    {
+                        var bitmap = new Bitmap(s);
+                        _size = bitmap.Size;
+                    }).Verifiable();
+
+                _queryString.Add("force", "true");
+                _queryString.Add("format", "png");
+                _queryString.Add("height", "1500.51");
+                _queryString.Add("width", "2000.51");
+
+                _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
+            }
+
+            [Test]
+            public void ShouldSendExpectedImageFormatToResponse()
+            {
+                _response.Object.ContentType.ShouldEqual("image/png");
+            }
+
+            [Test]
+            public void ShouldGenerateImageWithExpectedDimensions()
+            {
+                _size.Height.ShouldEqual(1500.51);
+                _size.Width.ShouldEqual(2000.51);
+            }
+
+            [Test]
+            public void ShouldHaveAlteredImageCache()
+            {
+                _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
+            }
+        }
+
+        public class WhenForcingSvgToPngWithDimensions : SvgMagicHandlerContext
         {
             protected Size _size;
 
@@ -321,7 +362,7 @@ namespace Storm.SvgMagic.UnitTests
             }
         }
 
-        public class WhenForcingSvgToBmpWithOnlyWidthDimension : SvgMagicHandlerContext
+        public class WhenForcingSvgToPngWithOnlyWidthDimension : SvgMagicHandlerContext
         {
             protected Size _size;
 
@@ -361,7 +402,7 @@ namespace Storm.SvgMagic.UnitTests
             }
         }
 
-        public class WhenForcingSvgToBmpWithOnlyHeightDimension : SvgMagicHandlerContext
+        public class WhenForcingSvgToPngWithOnlyHeightDimension : SvgMagicHandlerContext
         {
             protected Size _size;
 

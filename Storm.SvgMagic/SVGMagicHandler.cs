@@ -77,8 +77,8 @@ namespace Storm.SvgMagic
             }
             else
             {
-                options.Height = int.Parse(svg.Height.Value.ToString());
-                options.Width = int.Parse(svg.Width.Value.ToString());
+                options.Height = float.Parse(svg.Height.Value.ToString());
+                options.Width = float.Parse(svg.Width.Value.ToString());
             }
 
             var outputStream = new MemoryStream();
@@ -134,7 +134,7 @@ namespace Storm.SvgMagic
             try
             {
                 Thread.Sleep(50);
-                return File.Open(resourcePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+                return File.Open(resourcePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             }
             catch (IOException)
             {
@@ -157,6 +157,7 @@ namespace Storm.SvgMagic
             var startTime = DateTime.Now;
             try
             {
+                context.Response.BufferOutput = true;
                 ProcessRequestCore(context);
             }
             catch (SvgMagicException ex)

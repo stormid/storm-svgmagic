@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
@@ -157,7 +156,6 @@ namespace Storm.SvgMagic
             var startTime = DateTime.Now;
             try
             {
-                context.Response.BufferOutput = true;
                 ProcessRequestCore(context);
             }
             catch (SvgMagicException ex)
@@ -178,7 +176,6 @@ namespace Storm.SvgMagic
                 context.Response.AddHeader("X-SvgMagic-Version", _version);
                 context.Response.AddHeader("X-SvgMagic-ProcessingTime", elapsed.TotalMilliseconds.ToString());
                 context.Response.Flush();
-                context.Response.End();                
             }
         }
 

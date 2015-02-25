@@ -1,0 +1,29 @@
+﻿<!--
+    You can find existing browser definitions at
+    <windir>\Microsoft.NET\Framework\<ver>\CONFIG\Browsers
+-->
+<browsers>
+  <!--Mozilla/5.0 (Linux; U; Android 4.0.4; en-us; sdk Build/MR1) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30-->
+  <browser id="Android" parentID="WebKit">
+    <identification>
+      <userAgent match="Android.(?'version'(?'major'\d+)(?'minor'\.\d+)(?'build'\.\d+))\w*" />
+    </identification>
+    <capabilities>
+      <capability name="browser"                        value="Android" />
+      <capability name="majorVersion"                   value="${major}" />
+      <capability name="minorVersion"                   value="${minor}" />
+      <capability name="version"                        value="${version}" />
+      <capability name="type"                           value="Android${major}" />
+      <capability name="platform"                       value="Android" />
+      <capability name="mobileDeviceManufacturer"       value="Google" />
+      <capability name="activeXControls"                value="false" />
+      <capability name="backgroundSounds"               value="false" />
+      <capability name="beta"                           value="false" />
+      <capability name="canSendMail"                    value="false" />
+      <capability name="cookies"                        value="true" />
+      <capability name="frames"                         value="false" />
+      <capability name="isColor"                        value="true" />
+      <capability name="isMobileDevice"                 value="true" />
+    </capabilities>
+  </browser>
+</browsers>

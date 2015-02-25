@@ -7,6 +7,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Web;
+using System.Web.Configuration;
 using Storm.SvgMagic.Exceptions;
 using Storm.SvgMagic.Services;
 using Storm.SvgMagic.Services.Impl;
@@ -262,7 +263,11 @@ namespace Storm.SvgMagic
 
         protected virtual bool NoSvgSupport(SvgMagicOptions options, HttpBrowserCapabilitiesBase browser)
         {
-            return browser.Browser == "IE" && browser.MajorVersion < 9;
+			Debug.WriteLine(browser.Browser);
+	        return
+		        (browser.Browser == "IE" && browser.MajorVersion < 9) // IE8
+		        ||
+		        (browser.Browser == "Android" && browser.MajorVersion <= 4 && browser.MinorVersion < 4); // Android browser < 4.4 (requires App_Browsers files for detection
         }
 
         public bool IsReusable { get { return true; } }

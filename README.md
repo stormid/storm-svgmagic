@@ -83,3 +83,7 @@ This is better used to individually refresh an image directly, combine with the 
 
 * http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?force=true&refresh=true
 * http://storm-svgmagic.azurewebsites.net/Content/images/scotland.svg?force=true&refresh=true&format=png
+
+Android Browser detection
+-------------------------
+In order to detect android browsers (specifically those that do not support SVG, which is Android browser version 4.3 and below) the App_Browsers folder with a browsers definition file is required.  See the sample project for a copy of this android.browser file

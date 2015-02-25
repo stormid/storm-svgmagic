@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Configuration;
 using Moq;
 using NUnit.Framework;
 using Storm.SvgMagic.Services;
@@ -82,8 +84,8 @@ namespace Storm.SvgMagic.UnitTests
         protected Mock<HttpCachePolicyBase> _cachePolicy;
         protected Stream _outputStream;
         protected SvgMagicOptions _options;
-
-        protected Mock<HttpBrowserCapabilitiesBase> _browser;
+	    protected BrowserCapabilitiesFactory _browserCapFactory;
+		protected HttpBrowserCapabilities _browserCap;
 
         protected Mock<IImageCache> _imageCache;
 
@@ -92,6 +94,18 @@ namespace Storm.SvgMagic.UnitTests
             return Assembly.GetExecutingAssembly().GetManifestResourceStream("Storm.SvgMagic.UnitTests." +image +".svg");
         }
 
+		protected void SetupUserAgentStringForRequest(string userAgent)
+		{
+			_browserCap = new HttpBrowserCapabilities()
+			{
+				Capabilities = new Hashtable { { string.Empty, userAgent } }
+			};
+
+			_browserCapFactory.ConfigureBrowserCapabilities(new NameValueCollection(), _browserCap);
+
+			_request.SetupGet(s => s.Browser).Returns(new HttpBrowserCapabilitiesWrapper(_browserCap));
+		}
+
         protected override void SharedContext()
         {
             _requestContext = CreateDependency<HttpContextBase>();
@@ -99,8 +113,8 @@ namespace Storm.SvgMagic.UnitTests
             _response = CreateDependency<HttpResponseBase>();
             _cachePolicy = CreateDependency<HttpCachePolicyBase>();
             _imageCache = CreateDependency<IImageCache>();
-            _browser = CreateDependency<HttpBrowserCapabilitiesBase>();
 
+			_browserCapFactory = new BrowserCapabilitiesFactory();
             _headers = new NameValueCollection();
             _queryString = new NameValueCollection();
             _outputStream = new MemoryStream();
@@ -109,7 +123,6 @@ namespace Storm.SvgMagic.UnitTests
             _request.SetupGet(s => s.CurrentExecutionFilePathExtension).Returns(".svg");
             _request.SetupGet(s => s.Headers).Returns(_headers);
             _request.SetupGet(s => s.QueryString).Returns(_queryString);
-            _request.SetupGet(s => s.Browser).Returns(_browser.Object);
 
             _response.SetupAllProperties();
             _response.SetupGet(s => s.Cache).Returns(_cachePolicy.Object);
@@ -134,6 +147,7 @@ namespace Storm.SvgMagic.UnitTests
         {
             protected override void Context()
             {
+				SetupUserAgentStringForRequest("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)");
                 _imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Verifiable();
 
                 _options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
@@ -150,15 +164,13 @@ namespace Storm.SvgMagic.UnitTests
             {
                 _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Never);
             }
-
         }
 
-        public class WhenServingSvgToInCompatibleBrowser : SvgMagicHandlerContext
+        public class WhenServingSvgToInCompatibleBrowser_IE8 : SvgMagicHandlerContext
         {
             protected override void Context()
             {
-                _browser.SetupGet(s => s.Browser).Returns("IE");
-                _browser.SetupGet(s => s.MajorVersion).Returns(8);
+				SetupUserAgentStringForRequest("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)");
 
                 _imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Verifiable();
 
@@ -176,8 +188,73 @@ namespace Storm.SvgMagic.UnitTests
             {
                 _imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
             }
-
         }
+
+		/// <summary>
+		/// Github issue #8
+		/// </summary>
+		public class WhenServingSvgToInCompatibleBrowser_Android2 : SvgMagicHandlerContext
+		{
+			protected Mock<HttpBrowserCapabilitiesBase> _browserCapMock;
+			protected override void Context()
+			{
+				_browserCapMock = CreateDependency<HttpBrowserCapabilitiesBase>();
+
+				_browserCapMock.SetupGet(s => s.Browser).Returns("Android");
+				_browserCapMock.SetupGet(s => s.MajorVersion).Returns(2);
+				_browserCapMock.SetupGet(s => s.MinorVersion).Returns(2);
+				_request.SetupGet(s => s.Browser).Returns(_browserCapMock.Object);
+
+				_imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Verifiable();
+
+				_options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
+			}
+
+			[Test]
+			public void ShouldSendExpectedImageFormatToResponse()
+			{
+				_response.Object.ContentType.ShouldEqual("image/png");
+			}
+
+			[Test]
+			public void ShouldHaveAlteredImageCache()
+			{
+				_imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Once);
+			}
+		}
+
+		/// <summary>
+		/// Github issue #8
+		/// </summary>
+		public class WhenServingSvgToCompatibleAndroidBrowser : SvgMagicHandlerContext
+		{
+			protected Mock<HttpBrowserCapabilitiesBase> _browserCapMock;
+			protected override void Context()
+			{
+				_browserCapMock = CreateDependency<HttpBrowserCapabilitiesBase>();
+
+				_browserCapMock.SetupGet(s => s.Browser).Returns("Android");
+				_browserCapMock.SetupGet(s => s.MajorVersion).Returns(4);
+				_browserCapMock.SetupGet(s => s.MinorVersion).Returns(4);
+				_request.SetupGet(s => s.Browser).Returns(_browserCapMock.Object);
+
+				_imageCache.Setup(s => s.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>())).Verifiable();
+
+				_options = SvgMagicOptions.Parse(_queryString, new SvgMagicHandlerConfigurationSection());
+			}
+
+			[Test]
+			public void ShouldSendExpectedImageFormatToResponse()
+			{
+				_response.Object.ContentType.ShouldEqual("image/svg+xml");
+			}
+
+			[Test]
+			public void ShouldHaveAlteredImageCache()
+			{
+				_imageCache.Verify(v => v.Put(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<SvgMagicOptions>()), Times.Never);
+			}
+		}
 
         public class WhenForcingSvgToPng : SvgMagicHandlerContext
         {

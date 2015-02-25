@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("http://stormid.com")]
 [assembly: AssemblyProduct("Storm.SvgMagic")]
-[assembly: AssemblyCopyright("Copyright © Storm ID Ltd. 2014")]
+[assembly: AssemblyCopyright("Copyright © Storm ID Ltd. 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

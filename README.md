@@ -1,4 +1,4 @@
-storm-svgmagic
+storm-svgmagic [![Build status](https://ci.appveyor.com/api/projects/status/h2xekpp89e9x57b6/branch/master?svg=true)](https://ci.appveyor.com/project/StormID/storm-svgmagic/branch/master)
 ==============
 
 Provides HttpHandler fallback functionality for browsers that do not support SVG (Scalable Vector Graphics) by generating and caching alternate images at request time.  Inspired by SVGMagic (http://svgmagic.bitlabs.nl/)
